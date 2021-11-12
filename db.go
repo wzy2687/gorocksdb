@@ -101,9 +101,9 @@ func OpenDbForSecondary(opts *Options, name string, secName string) (*DB, error)
 	}, nil
 }
 
-func TryCatchUpWithPrimary(db *DB ) ( error) {
+func (db *DB) TryCatchUpWithPrimary() error {
 	var (
-		cErr   *C.char
+		cErr *C.char
 	)
 	C.rocksdb_try_catch_up_with_primary(db.c, &cErr)
 	if cErr != nil {
@@ -112,8 +112,6 @@ func TryCatchUpWithPrimary(db *DB ) ( error) {
 	}
 	return nil
 }
-
-
 
 // OpenDbColumnFamilies opens a database with the specified column families.
 func OpenDbColumnFamilies(
