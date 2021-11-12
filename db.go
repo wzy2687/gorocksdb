@@ -80,7 +80,7 @@ func OpenDbForReadOnly(opts *Options, name string, errorIfLogFileExist bool) (*D
 	}, nil
 }
 
-func OpenDbForSecondary(opts *Options, name string, secName string, errorIfLogFileExist bool) (*DB, error) {
+func OpenDbForSecondary(opts *Options, name string, secName string) (*DB, error) {
 	var (
 		cErr   *C.char
 		cName  = C.CString(name)
@@ -100,6 +100,20 @@ func OpenDbForSecondary(opts *Options, name string, secName string, errorIfLogFi
 		opts: opts,
 	}, nil
 }
+
+func TryCatchUpWithPrimary(db *DB ) ( error) {
+	var (
+		cErr   *C.char
+	)
+	C.rocksdb_try_catch_up_with_primary(db.c, &cErr)
+	if cErr != nil {
+		defer C.rocksdb_free(unsafe.Pointer(cErr))
+		return errors.New(C.GoString(cErr))
+	}
+	return nil
+}
+
+
 
 // OpenDbColumnFamilies opens a database with the specified column families.
 func OpenDbColumnFamilies(
